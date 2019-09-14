@@ -1,23 +1,24 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-using namespace std;
 
+using namespace std;
 
 class cmdline
 {
 public:
     void feed(int argc, char *argv[])
     {
+        // nyi
     }
 
     template<typename T>
     void setopt(char flag, T& val, string help)
     {
-        // LEAK
-        auto e = new entry{flag, val, help};
-        flags.push_back(e);
+        auto e = make_unique<entry<T>>(flag, val, help);
+        flags.push_back(move(e));
     }
 
 private:
@@ -50,7 +51,7 @@ private:
 
     };
 
-public: // debugging
-    vector<ebase*> flags;
+public: // public during debugging
+    vector<unique_ptr<ebase>> flags;
 
 };

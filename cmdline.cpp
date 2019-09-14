@@ -1,9 +1,6 @@
 #include <iostream>
-
-#include "cmdline.h"
-
 #include <string>
-
+#include "cmdline.h"
 using namespace std;
 
 class cmdopts: public cmdline
@@ -22,7 +19,6 @@ public:
         setopt('t', tflag,    "print table");
     }
 };
-
 
 int main(int argc, char *argv[])
 {
