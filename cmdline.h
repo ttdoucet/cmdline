@@ -11,7 +11,7 @@ class cmdline
 public:
     void feed(int argc, char *argv[])
     {
-        // nyi
+        // cmdline parsing nyi
     }
 
     template<typename T>
@@ -34,7 +34,6 @@ private:
         // We do not need to know the type of the destination here.
         // We only need to be able to set it from a string or istream.
         virtual istream& set_value(istream& s) { return s; }
-
     };
 
     template<typename T>
@@ -48,10 +47,8 @@ private:
         {
             return s >> val;
         }
-
     };
 
 public: // public during debugging
     vector<unique_ptr<ebase>> flags;
-
 };
