@@ -9,9 +9,29 @@ using namespace std;
 class cmdline
 {
 public:
-    void feed(int argc, char *argv[])
+
+    vector<string> Args;
+
+    void parse(int argc, char *argv[])
     {
-        // cmdline parsing nyi
+        for (; argc; --argc, ++argv)
+            Args.push_back(argv[0]);
+
+        for (string& s : Args)
+        {
+            if (s[0] == '-')
+            {
+                if  (s[1] == '-')
+                {
+                    cout << "full flag: " << s.substr(2) << "\n";
+                    continue;
+                }
+                for (char ch : s)
+                    cout << "flag: " << ch << "\n";
+            }
+            else
+                cout << "arg: " << s << "\n";
+        }
     }
 
     template<typename T>
