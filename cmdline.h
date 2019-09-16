@@ -18,20 +18,16 @@ public:
             Args.push_back(argv[0]);
 
         for (string& s : Args)
-        {
             if (s[0] == '-')
             {
                 if  (s[1] == '-')
-                {
                     cout << "full flag: " << s.substr(2) << "\n";
-                    continue;
-                }
-                for (char ch : s)
-                    cout << "flag: " << ch << "\n";
+                else
+                    for (char ch : s.substr(1))
+                        cout << "flag: " << ch << "\n";
             }
             else
                 cout << "arg: " << s << "\n";
-        }
     }
 
     template<typename T>
