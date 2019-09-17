@@ -27,18 +27,11 @@ int main(int argc, char *argv[])
     cmdopts opts;
     opts.parse(argc, argv);
 
+    cout << "\nflag values\n";
     cout << "verbose: " << opts.verbose << "\n";
     cout << "tflag: " << opts.tflag << "\n";
     cout << "compress: " << opts.zflag << "\n";
     cout << "file name: " << opts.filename << "\n";
-
-    // hack to test the machinery & concept
-    auto& vflag = opts.flags[0];
-    cout << "vflag char: " << vflag->flag << "\n";
-    cout << "vflag help: " << vflag->help << "\n";
-    vflag->set_value(cin);
-
-    cout << "now vflag is " << opts.verbose << "\n";
-
+    cout << "bflag: " << opts.bflag << "\n";
 }
 

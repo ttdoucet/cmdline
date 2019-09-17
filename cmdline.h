@@ -56,8 +56,10 @@ private:
         char flag;
         string help;
         string longform;
+        bool consume;
 
-        ebase(char f, string h, string _longform) : flag(f), help(h), longform(_longform) { }
+        ebase(char f, string h, string _longform, bool _consume=true)
+            : flag(f), help(h), longform(_longform), consume(_consume) { }
 
         // We do not need to know the type of the destination here.
         // We only need to be able to set it from a string or istream.
@@ -69,10 +71,9 @@ private:
     {
         T& val;
 
-        entry(char flag, T& v, string help, string lform): ebase{flag, help, lform}, val{v}
-        {
-            cout << "ctor entry for flag " << flag << "\n";
-        }
+        entry(char flag, T& v, string help, string lform)
+            : ebase{flag, help, lform}, val{v}
+        { }
 
         istream& set_value(istream& s)
         {
@@ -80,7 +81,6 @@ private:
         }
     };
 
-public: // public during debugging
     vector<unique_ptr<ebase>> flags;
 };
 
@@ -89,10 +89,9 @@ struct cmdline::entry<bool> : public cmdline::ebase
 {
     bool& val;
 
-    entry(char flag, bool& v, string help, string lform): ebase{flag, help, lform}, val{v}
-    {
-        cout << "ctor spec entry<bool> for flag " << flag << "\n";
-    }
+    entry(char flag, bool& v, string help, string lform)
+        : ebase{flag, help, lform, false}, val{v}
+    { }
 
     istream& set_value(istream& s)
     {
