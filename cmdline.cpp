@@ -9,6 +9,7 @@ public:
     int verbose = 0;
     int tflag = 1;
     int zflag = 0;
+    bool bflag = false;
     string filename;
 
     cmdopts()
@@ -17,6 +18,7 @@ public:
         setopt('f', filename, "file name");
         setopt('z', zflag,    "compress");
         setopt('t', tflag,    "print table");
+        setopt('b', bflag,    "boolean flag");
     }
 };
 
