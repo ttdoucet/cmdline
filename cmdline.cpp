@@ -6,9 +6,9 @@ using namespace std;
 class cmdopts: public cmdline
 {
 public:
-    int verbose = 0;
-    int tflag = 1;
-    int zflag = 0;
+    bool verbose = 0;
+    bool tflag = 1;
+    bool zflag = 0;
     bool bflag = false;
     string filename;
 

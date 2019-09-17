@@ -3,6 +3,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -11,6 +14,7 @@ class cmdline
 public:
 
     vector<string> Args;
+    vector<string> ExtraArgs;
 
     void parse(int argc, char *argv[])
     {
@@ -27,8 +31,14 @@ public:
                     for (char ch : s.substr(1))
                         short_flag(ch);
             }
+            else if (need.empty())
+                ExtraArgs.push_back(s);
             else
-                cout << "arg: " << s << "\n";
+            {
+                    auto &option = flags[need.front()];
+                    need.pop();
+                    option->set_value(s);
+            }
         }
     }
 
@@ -43,12 +53,29 @@ private:
 
     void full_flag(const string& f)
     {
-        cout << "full flag: " << f << "\n";        
+        cout << "nyi: full flag: " << f << "\n";        
+    }
+
+    int find_flag(char ch)
+    {
+        for (int i = 0; i < flags.size(); ++i)
+            if (flags[i]->flag == ch)
+                return i;
+        return flags.size();
     }
 
     void short_flag(char ch)
     {
-        cout << "flag: " << ch << "\n";
+        int i = find_flag(ch);
+        if (i < flags.size() )
+        {
+            if (flags[i]->needs_arg)
+                need.push(i);
+            else
+                flags[i]->set_value(""s);
+        }
+
+        // nyi: error on unknown flag
     }
 
     struct ebase
@@ -56,15 +83,16 @@ private:
         char flag;
         string help;
         string longform;
-        bool consume;
+        bool needs_arg;
 
-        ebase(char f, string h, string _longform, bool _consume=true)
-            : flag(f), help(h), longform(_longform), consume(_consume) { }
+        ebase(char f, string h, string _longform, bool _needs_arg = true)
+            : flag(f), help(h), longform(_longform), needs_arg(_needs_arg) { }
 
         // We do not need to know the type of the destination here.
-        // We only need to be able to set it from a string or istream.
-        virtual istream& set_value(istream& s) { return s; }
+        // We only need to be able to set it from a string.
+        virtual void set_value(string s) = 0;
     };
+
 
     template<typename T>
     struct entry: public ebase
@@ -72,17 +100,19 @@ private:
         T& val;
 
         entry(char flag, T& v, string help, string lform)
-            : ebase{flag, help, lform}, val{v}
-        { }
+            : ebase{flag, help, lform}, val{v}  { }
 
-        istream& set_value(istream& s)
+        void set_value(string s)
         {
-            return s >> val;
+            stringstream ss{s};
+            ss >> val;  // nyi: check for error
         }
     };
 
     vector<unique_ptr<ebase>> flags;
+    queue<int> need;
 };
+
 
 template<>
 struct cmdline::entry<bool> : public cmdline::ebase
@@ -90,13 +120,8 @@ struct cmdline::entry<bool> : public cmdline::ebase
     bool& val;
 
     entry(char flag, bool& v, string help, string lform)
-        : ebase{flag, help, lform, false}, val{v}
-    { }
+        : ebase{flag, help, lform, false}, val{v} { }
 
-    istream& set_value(istream& s)
-    {
-        val = !val;
-        return s;
-    }
+    void set_value(string unused) { val = !val; }
 };
 
