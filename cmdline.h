@@ -3,8 +3,11 @@
      - Clients need a way to customize the usage message,
        at least a little.  Like, a summary line that says what
        the program actually does.
-*/
 
+     - What about clean --help command?
+
+     - What about clean --version command?
+*/
 #pragma once
 
 #include <memory>
@@ -96,11 +99,16 @@ public:
 
         for (auto& flag : flags)
         {
-            cerr << "  -" << flag->flag;
+            bool has_short = (flag->flag != ' ');
+            if (has_short)
+                cerr << "  -" << flag->flag;
+            else
+                cerr << "    ";
 
             string col2;
             if (flag->longform.length())
-                col2 = ", "s + flag->longform;
+                col2 = (has_short? ", "s : "  "s) + flag->longform;
+
             cerr << setw(15) << col2;
             cerr << " " << flag->help << "\n";
         }

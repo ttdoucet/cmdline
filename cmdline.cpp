@@ -25,8 +25,8 @@ public:
         setopt('b', bflag,   "Random boolean flag.");
 
         setopt('f', "--filename", filename, "<file> Name of the output file.");
-        setopt('a', "--alpha",    alpha,    "<float> Learning rate.");
         setopt('n', "--trials",   trials,   "<num> Number of games to play.");
+        setopt('a', "--alpha",    alpha,    "<float> Learning rate.");
 
         setopt("--gamma", gamma, "<float> Credit decay rate.");
     }
