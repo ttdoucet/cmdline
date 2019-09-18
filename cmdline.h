@@ -1,13 +1,5 @@
-/*
-   Todo:
-     - Clients need a way to customize the usage message,
-       at least a little.  Like, a summary line that says what
-       the program actually does.
-
-     - What about clean --help command?
-
-     - What about clean --version command?
-*/
+/* Written by Todd Doucet.
+ */
 #pragma once
 
 #include <memory>
@@ -21,174 +13,174 @@
 #include <iomanip>
 #include <iostream>
 
-namespace detail_cmdline {
-
-using namespace std;
-
-class cmdline
+namespace detail_cmdline
 {
-public:
+    using namespace std;
 
-    vector<string> Args;
-    vector<string> ExtraArgs;
-
-    void parse(int argc, char *argv[])
+    class cmdline
     {
-        for (; argc; --argc, ++argv)
-            Args.push_back(argv[0]);
+    public:
 
-        try
+        vector<string> Args;
+        vector<string> ExtraArgs;
+
+        void parse(int argc, char *argv[])
         {
-            for (const string& s : Args)
+            for (; argc; --argc, ++argv)
+                Args.push_back(argv[0]);
+
+            try
             {
-                if (s[0] == '-')
+                for (const string& s : Args)
                 {
-                    if  (s[1] == '-')
-                        do_flag(s);
+                    if (s[0] == '-')
+                    {
+                        if  (s[1] == '-')
+                            do_flag(s);
+                        else
+                            for (char ch : s.substr(1))
+                                do_flag(ch);
+                    }
+                    else if (need.empty())
+                        ExtraArgs.push_back(s);
                     else
-                        for (char ch : s.substr(1))
-                            do_flag(ch);
+                    {
+                        int i = need.front();
+                        need.pop();
+                        flags[i]->set_value(s);
+                    }
                 }
-                else if (need.empty())
-                    ExtraArgs.push_back(s);
-                else
-                {
-                    int i = need.front();
-                    need.pop();
-                    flags[i]->set_value(s);
-                }
+
+                if (need.empty() == false)
+                    throw runtime_error("Missing parameter value"s);
             }
-
-            if (need.empty() == false)
-                throw runtime_error("Missing parameter value"s);
+            catch(exception& e)
+            {
+                usage(e.what());
+            }
         }
-        catch(exception& e)
+
+        template<typename T>
+        void setopt(char flag, T& val, string help)
         {
-            usage(e.what());
+            auto e = make_unique<entry<T>>(flag, ""s, val, help);
+            flags.push_back(move(e));
         }
-    }
 
-    template<typename T>
-    void setopt(char flag, T& val, string help)
-    {
-        auto e = make_unique<entry<T>>(flag, ""s, val, help);
-        flags.push_back(move(e));
-    }
-
-    template<typename T>
-    void setopt(string longform, T& val, string help)
-    {
-        auto e = make_unique<entry<T>>(' ', longform, val, help);
-        flags.push_back(move(e));
-    }
-
-    template<typename T>
-    void setopt(char flag, string longform, T& val, string help)
-    {
-        auto e = make_unique<entry<T>>(flag, longform, val, help);
-        flags.push_back(move(e));
-    }
-
-    void usage(const string& s=""s)
-    {
-        if (s.length())
-            cerr << s << "\n";
-
-        cerr << "Usage: " << Args[0] << " [options] [args]" << "\n\n";
-        cerr << "Options:\n" << std::left;
-
-        for (auto& flag : flags)
+        template<typename T>
+        void setopt(string longform, T& val, string help)
         {
-            bool has_short = (flag->flag != ' ');
-            if (has_short)
-                cerr << "  -" << flag->flag;
+            auto e = make_unique<entry<T>>(' ', longform, val, help);
+            flags.push_back(move(e));
+        }
+
+        template<typename T>
+        void setopt(char flag, string longform, T& val, string help)
+        {
+            auto e = make_unique<entry<T>>(flag, longform, val, help);
+            flags.push_back(move(e));
+        }
+
+        void usage(const string& s=""s)
+        {
+            if (s.length())
+                cerr << s << "\n";
+
+            cerr << "Usage: " << Args[0] << " [options] [args]" << "\n\n";
+            cerr << "Options:\n" << std::left;
+
+            for (auto& flag : flags)
+            {
+                bool has_short = (flag->flag != ' ');
+                if (has_short)
+                    cerr << "  -" << flag->flag;
+                else
+                    cerr << "    ";
+
+                string col2;
+                if (flag->longform.length())
+                    col2 = (has_short? ", "s : "  "s) + flag->longform;
+
+                cerr << setw(15) << col2;
+                cerr << " " << flag->help << "\n";
+            }
+            std::exit(1);
+        }
+
+    private:
+
+        int find_opt(char ch)
+        {
+            for (size_t i = 0; i < flags.size(); ++i)
+                if (flags[i]->flag == ch)
+                    return i;
+            throw runtime_error("Unknown switch: -"s + ch);
+        }
+
+        int find_opt(const string& longform)
+        {
+            for (size_t i = 0; i < flags.size(); ++i)
+                if (flags[i]->longform == longform)
+                    return i;
+            throw runtime_error("Unknown switch: "s + longform);
+        }
+
+        template<typename T>
+        void do_flag(T flag)
+        {
+            int i = find_opt(flag);
+            if (flags[i]->needs_arg)
+                need.push(i);
             else
-                cerr << "    ";
-
-            string col2;
-            if (flag->longform.length())
-                col2 = (has_short? ", "s : "  "s) + flag->longform;
-
-            cerr << setw(15) << col2;
-            cerr << " " << flag->help << "\n";
+                flags[i]->set_value(""s);
         }
-        std::exit(1);
-    }
 
-private:
-
-    int find_opt(char ch)
-    {
-        for (size_t i = 0; i < flags.size(); ++i)
-            if (flags[i]->flag == ch)
-                return i;
-        throw runtime_error("Unknown switch: -"s + ch);
-    }
-
-    int find_opt(const string& longform)
-    {
-        for (size_t i = 0; i < flags.size(); ++i)
-            if (flags[i]->longform == longform)
-                return i;
-        throw runtime_error("Unknown switch: "s + longform);
-    }
-
-    template<typename T>
-    void do_flag(T flag)
-    {
-        int i = find_opt(flag);
-        if (flags[i]->needs_arg)
-            need.push(i);
-        else
-            flags[i]->set_value(""s);
-    }
-
-    struct ebase
-    {
-        char flag;
-        string help;
-        string longform;
-        bool needs_arg;
-
-        ebase(char f, string lform, string h, bool needs = true)
-            : flag(f), help(h), longform(lform), needs_arg(needs) { }
-
-        // We do not need to know the type of the destination here.
-        // We only need to be able to set it from a string.
-        virtual void set_value(const string& s) = 0;
-    };
-
-    template<typename T>
-    struct entry: public ebase
-    {
-        T& val;
-
-        entry(char flag, string longform, T& v, string help)
-            : ebase{flag, longform, help}, val{v}  { }
-
-        void set_value(const string& s)
+        struct ebase
         {
-            stringstream ss{s};
-            ss >> val;
-            if (ss.fail() || !ss.eof())
-                throw runtime_error("unexpected value: '"s + s + "'"s);
-        }
+            char flag;
+            string help;
+            string longform;
+            bool needs_arg;
+
+            ebase(char f, string lform, string h, bool needs = true)
+                : flag(f), help(h), longform(lform), needs_arg(needs) { }
+
+            // We do not need to know the type of the destination here.
+            // We only need to be able to set it from a string.
+            virtual void set_value(const string& s) = 0;
+        };
+
+        template<typename T>
+        struct entry: public ebase
+        {
+            T& val;
+
+            entry(char flag, string longform, T& v, string help)
+                : ebase{flag, longform, help}, val{v}  { }
+
+            void set_value(const string& s)
+            {
+                stringstream ss{s};
+                ss >> val;
+                if (ss.fail() || !ss.eof())
+                    throw runtime_error("unexpected value: '"s + s + "'"s);
+            }
+        };
+
+        vector<unique_ptr<ebase>> flags;
+        queue<int> need;
     };
 
-    vector<unique_ptr<ebase>> flags;
-    queue<int> need;
-};
+    template<>
+    struct cmdline::entry<bool> : public cmdline::ebase
+    {
+        bool& val;
 
-template<>
-struct cmdline::entry<bool> : public cmdline::ebase
-{
-    bool& val;
+        entry(char flag, string lform, bool& v, string help)
+            : ebase{flag, lform, help, false}, val{v} { }
 
-    entry(char flag, string lform, bool& v, string help)
-        : ebase{flag, lform, help, false}, val{v} { }
-
-    void set_value(const string&) { val = !val; }
-};
+        void set_value(const string&) { val = !val; }
+    };
 
 } // namespace
 
