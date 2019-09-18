@@ -3,4 +3,4 @@
 cppflags = --std=c++17 -O3
 
 : foreach *.cpp  |> $(cxx) $(cppflags) -Wall -c %f -o %o |> %B.o
-: *.o |> $(cxx) $(cppflags) %f -o %o |> project
+: *.o |> $(cxx) $(cppflags) %f -o %o |> demo

@@ -1,22 +1,22 @@
-/* Written by Todd Doucet. */
+/* Written by Todd Doucet.
+ */
 #pragma once
-#include <memory>
+
 #include <string>
 #include <vector>
-#include <sstream>
 #include <queue>
-#include <algorithm>
+#include <sstream>
+#include <iomanip>
 #include <stdexcept>
 #include <cstdlib>
-#include <iomanip>
-#include <iostream>
 
 namespace detail_cmdline
 {
     using namespace std;
 
-    struct cmdline
+    class cmdline
     {
+    public:
         vector<string> Args;
         vector<string> ExtraArgs;
 
@@ -163,7 +163,7 @@ namespace detail_cmdline
             entry(char flag, string longform, T& v, string help)
                 : ebase{flag, longform, help}, val{v}  { }
 
-            void set_value(const string& s)
+            void set_value(const string& s) override
             {
                 stringstream ss{s};
                 ss >> val;
@@ -185,7 +185,7 @@ namespace detail_cmdline
         entry(char flag, string lform, bool& v, string help)
             : ebase{flag, lform, help, false}, val{v} { }
 
-        void set_value(const string&) { val = !val; }
+        void set_value(const string&) override { val = !val; }
     };
 } // namespace
 
