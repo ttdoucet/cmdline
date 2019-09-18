@@ -6,23 +6,29 @@ using namespace std;
 class cmdopts: public cmdline
 {
 public:
-    bool verbose = 0;
-    bool tflag = 1;
-    bool zflag = 0;
+    string filename;
+    bool verbose = false;
+    bool tflag = true;
+    bool zflag = false;
     bool bflag = false;
     int trials = 10;
     float alpha = 0.05;
-    string filename;
+    float gamma = 0;
+
 
     cmdopts()
     {
-        setopt('v', verbose,  "Extra informational messages.");
-        setopt('f', filename, "<file> Name of the output file.", "--filename");
-        setopt('n', trials,   "<num>  Number of trials to run.", "--trials");
-        setopt('z', zflag,    "Compress.");
-        setopt('t', tflag,    "Print table.");
-        setopt('b', bflag,    "Random boolean flag.");
-        setopt('a', alpha,    "<float> Learning rate.",  "--alpha");
+        setopt('v', verbose, "Extra informational messages.");
+
+        setopt('z', zflag,   "Compress.");
+        setopt('t', tflag,   "Print table.");
+        setopt('b', bflag,   "Random boolean flag.");
+
+        setopt('f', "--filename", filename, "<file> Name of the output file.");
+        setopt('a', "--alpha",    alpha,    "<float> Learning rate.");
+        setopt('n', "--trials",   trials,   "<num> Number of games to play.");
+
+        setopt("--gamma", gamma, "<float> Credit decay rate.");
     }
 };
 
@@ -38,12 +44,11 @@ int main(int argc, char *argv[])
     cout << "bflag: " << opts.bflag << "\n";
     cout << "trials: " << opts.trials << "\n";
     cout << "alpha: " << opts.alpha << "\n";
+    cout << "gamma: " << opts.gamma << "\n";
 
     cout << "\n";
     cout << "ExtraArgs:\n";
     for (string& s : opts.ExtraArgs)
         cout << s << "\n";
-
-
 }
 

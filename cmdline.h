@@ -3,8 +3,6 @@
      - Clients need a way to customize the usage message,
        at least a little.  Like, a summary line that says what
        the program actually does.
-
-     - It seems limiting to force a short form for all flags.
 */
 
 #pragma once
@@ -20,8 +18,7 @@
 #include <iomanip>
 #include <iostream>
 
-namespace detail_cmdline
-{
+namespace detail_cmdline {
 
 using namespace std;
 
@@ -69,9 +66,23 @@ public:
     }
 
     template<typename T>
-    void setopt(char flag, T& val, string help, string longform=""s)
+    void setopt(char flag, T& val, string help)
     {
-        auto e = make_unique<entry<T>>(flag, val, help, longform);
+        auto e = make_unique<entry<T>>(flag, ""s, val, help);
+        flags.push_back(move(e));
+    }
+
+    template<typename T>
+    void setopt(string longform, T& val, string help)
+    {
+        auto e = make_unique<entry<T>>(' ', longform, val, help);
+        flags.push_back(move(e));
+    }
+
+    template<typename T>
+    void setopt(char flag, string longform, T& val, string help)
+    {
+        auto e = make_unique<entry<T>>(flag, longform, val, help);
         flags.push_back(move(e));
     }
 
@@ -131,7 +142,7 @@ private:
         string longform;
         bool needs_arg;
 
-        ebase(char f, string h, string lform, bool needs = true)
+        ebase(char f, string lform, string h, bool needs = true)
             : flag(f), help(h), longform(lform), needs_arg(needs) { }
 
         // We do not need to know the type of the destination here.
@@ -144,8 +155,8 @@ private:
     {
         T& val;
 
-        entry(char flag, T& v, string help, string lform)
-            : ebase{flag, help, lform}, val{v}  { }
+        entry(char flag, string longform, T& v, string help)
+            : ebase{flag, longform, help}, val{v}  { }
 
         void set_value(const string& s)
         {
@@ -165,8 +176,8 @@ struct cmdline::entry<bool> : public cmdline::ebase
 {
     bool& val;
 
-    entry(char flag, bool& v, string help, string lform)
-        : ebase{flag, help, lform, false}, val{v} { }
+    entry(char flag, string lform, bool& v, string help)
+        : ebase{flag, lform, help, false}, val{v} { }
 
     void set_value(const string&) { val = !val; }
 };
