@@ -16,8 +16,8 @@ public:
     cmdopts()
     {
         setopt('v', verbose,  "Extra informational messages.");
-        setopt('f', filename, "<file> Name of the output file.", "filename");
-        setopt('n', trials,   "<num>  Number of trials to run.", "trials");
+        setopt('f', filename, "<file> Name of the output file.", "--filename");
+        setopt('n', trials,   "<num>  Number of trials to run.", "--trials");
         setopt('z', zflag,    "Compress.");
         setopt('t', tflag,    "Print table.");
         setopt('b', bflag,    "Random boolean flag.");

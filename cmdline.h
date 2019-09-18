@@ -1,10 +1,6 @@
 /*
    Todo:
-     - figure out what is happening with the -- sequence
-
-     - bare "unknown option" is lame
-
-     - Clients also want a way to customize the usage message,
+     - Clients need a way to customize the usage message,
        at least a little.  Like, a summary line that says what
        the program actually does.
 
@@ -12,6 +8,7 @@
 
      - It seems limiting to force a short form for all flags.
 
+     - Many instances of string should be string& or const string&.
 */
 
 #pragma once
@@ -47,10 +44,10 @@ public:
                 if (s[0] == '-')
                 {
                     if  (s[1] == '-')
-                        flag(' ', s.substr(2));
+                        do_flag(find_opt(s));
                     else
                         for (char ch : s.substr(1))
-                            flag(ch, " "s);
+                            do_flag(find_opt(ch));
                 }
                 else if (need.empty())
                     ExtraArgs.push_back(s);
@@ -76,10 +73,8 @@ public:
         if (s.length())
             cerr << s << "\n";
 
-        cerr << "Usage: " << Args[0] << " [options] [args]" << "\n";
-        cerr << "\n";
-        cerr << "Options:\n";
-        cerr << std::left;
+        cerr << "Usage: " << Args[0] << " [options] [args]" << "\n\n";
+        cerr << "Options:\n" << std::left;
 
         for (auto& flag : flags)
         {
@@ -87,11 +82,10 @@ public:
 
             string col2;
             if (flag->longform.length())
-                col2 = ", --"s + flag->longform;
+                col2 = ", "s + flag->longform;
             cerr << setw(15) << col2;
             cerr << " " << flag->help << "\n";
         }
-
         std::exit(1);
     }
 
@@ -104,23 +98,24 @@ public:
 
 private:
 
-    int find_flag(char ch, string longform)
+    int find_opt(char ch)
     {
         for (int i = 0; i < flags.size(); ++i)
             if (flags[i]->flag == ch)
                 return i;
-            else if (flags[i]->longform == longform)
-                return i;
-
-        return flags.size();
+        throw runtime_error("Unknown switch: -"s + ch);
     }
 
-    void flag(char ch, string longform)
+    int find_opt(string longform)
     {
-        int i = find_flag(ch, longform);
-        if (i == flags.size() )
-            throw runtime_error("unknown flag");
+        for (int i = 0; i < flags.size(); ++i)
+            if (flags[i]->longform == longform)
+                return i;
+        throw runtime_error("Unknown switch: "s + longform);
+    }
 
+    void do_flag(int i)
+    {
         if (flags[i]->needs_arg)
             need.push(i);
         else
