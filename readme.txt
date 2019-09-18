@@ -5,7 +5,7 @@ Flag values:
   trials: 19
   alpha: 0.0001
   gamma: 99.3
-$
+
 ExtraArgs:
   ./demo
   foo
