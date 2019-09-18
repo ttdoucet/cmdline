@@ -8,9 +8,6 @@ class cmdopts: public cmdline
 public:
     string filename;
     bool verbose = false;
-    bool tflag = true;
-    bool zflag = false;
-    bool bflag = false;
     int trials = 10;
     float alpha = 0.05;
     float gamma = 0;
