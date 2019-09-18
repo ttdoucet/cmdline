@@ -1,9 +1,9 @@
 /*
    Todo:
      - Stop on errors instead of continuing.
-     - longform arguments
      - usage() construction
- */
+     - figure out what is happening with the -- sequence
+*/
 
 #pragma once
 
@@ -14,6 +14,7 @@
 #include <queue>
 #include <algorithm>
 #include <stdexcept>
+#include <cstdlib>
 
 using namespace std;
 
@@ -36,10 +37,10 @@ public:
                 if (s[0] == '-')
                 {
                     if  (s[1] == '-')
-                        full_flag(s.substr(2));
+                        flag(' ', s.substr(2));
                     else
                         for (char ch : s.substr(1))
-                            short_flag(ch);
+                            flag(ch, " "s);
                 }
                 else if (need.empty())
                     ExtraArgs.push_back(s);
@@ -64,7 +65,17 @@ public:
     {
         if (s.length())
             cerr << s << "\n";
-        cerr << "usage(): nyi\n";
+
+        cerr << "Usage:\n";
+        for (auto& flag : flags)
+        {
+            cerr << " -" << flag->flag;
+            if (flag->longform.length())
+                cerr << ", --" << flag->longform;
+            cerr << "  " << flag->help << "\n";
+        }
+
+        std::exit(1);
     }
 
     template<typename T>
@@ -76,24 +87,22 @@ public:
 
 private:
 
-    void full_flag(const string& f)
-    {
-        throw runtime_error("nyi: full flag: " + f);
-    }
-
-    int find_flag(char ch)
+    int find_flag(char ch, string longform)
     {
         for (int i = 0; i < flags.size(); ++i)
             if (flags[i]->flag == ch)
                 return i;
+            else if (flags[i]->longform == longform)
+                return i;
+
         return flags.size();
     }
 
-    void short_flag(char ch)
+    void flag(char ch, string longform)
     {
-        int i = find_flag(ch);
+        int i = find_flag(ch, longform);
         if (i == flags.size() )
-            throw runtime_error("unknown flag: "s + ch);
+            throw runtime_error("unknown flag");
 
         if (flags[i]->needs_arg)
             need.push(i);
@@ -108,8 +117,8 @@ private:
         string longform;
         bool needs_arg;
 
-        ebase(char f, string h, string _longform, bool _needs_arg = true)
-            : flag(f), help(h), longform(_longform), needs_arg(_needs_arg) { }
+        ebase(char f, string h, string lform, bool needs = true)
+            : flag(f), help(h), longform(lform), needs_arg(needs) { }
 
         // We do not need to know the type of the destination here.
         // We only need to be able to set it from a string.

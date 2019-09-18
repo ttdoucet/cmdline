@@ -15,7 +15,8 @@ public:
     cmdopts()
     {
         setopt('v', verbose,  "verbose output.");
-        setopt('f', filename, "file name");
+        setopt('f', filename, "file name", "filename"
+            );
         setopt('z', zflag,    "compress");
         setopt('t', tflag,    "print table");
         setopt('b', bflag,    "boolean flag");
@@ -27,7 +28,6 @@ int main(int argc, char *argv[])
     cmdopts opts;
     opts.parse(argc, argv);
 
-    cout << "\nflag values\n";
     cout << "verbose: " << opts.verbose << "\n";
     cout << "tflag: " << opts.tflag << "\n";
     cout << "compress: " << opts.zflag << "\n";
