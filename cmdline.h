@@ -1,3 +1,10 @@
+/*
+   Todo:
+     - Stop on errors instead of continuing.
+     - longform arguments
+     - usage() construction
+ */
+
 #pragma once
 
 #include <memory>
@@ -6,6 +13,7 @@
 #include <sstream>
 #include <queue>
 #include <algorithm>
+#include <stdexcept>
 
 using namespace std;
 
@@ -21,25 +29,42 @@ public:
         for (; argc; --argc, ++argv)
             Args.push_back(argv[0]);
 
-        for (string& s : Args)
+        try
         {
-            if (s[0] == '-')
+            for (string& s : Args)
             {
-                if  (s[1] == '-')
-                    full_flag(s.substr(2));
+                if (s[0] == '-')
+                {
+                    if  (s[1] == '-')
+                        full_flag(s.substr(2));
+                    else
+                        for (char ch : s.substr(1))
+                            short_flag(ch);
+                }
+                else if (need.empty())
+                    ExtraArgs.push_back(s);
                 else
-                    for (char ch : s.substr(1))
-                        short_flag(ch);
-            }
-            else if (need.empty())
-                ExtraArgs.push_back(s);
-            else
-            {
-                    auto &option = flags[need.front()];
+                {
+                    int i = need.front();
                     need.pop();
-                    option->set_value(s);
+                    flags[i]->set_value(s);
+                }
             }
+
+            if (need.empty() == false)
+                throw runtime_error("Missing parameter value"s);
         }
+        catch(exception& e)
+        {
+            usage(e.what());
+        }
+    }
+
+    void usage(string s=""s)
+    {
+        if (s.length())
+            cerr << s << "\n";
+        cerr << "usage(): nyi\n";
     }
 
     template<typename T>
@@ -53,7 +78,7 @@ private:
 
     void full_flag(const string& f)
     {
-        cout << "nyi: full flag: " << f << "\n";        
+        throw runtime_error("nyi: full flag: " + f);
     }
 
     int find_flag(char ch)
@@ -74,8 +99,8 @@ private:
             else
                 flags[i]->set_value(""s);
         }
-
-        // nyi: error on unknown flag
+        else
+            throw runtime_error("unknown flag: "s + ch);
     }
 
     struct ebase
@@ -92,7 +117,6 @@ private:
         // We only need to be able to set it from a string.
         virtual void set_value(string s) = 0;
     };
-
 
     template<typename T>
     struct entry: public ebase
@@ -112,7 +136,6 @@ private:
     vector<unique_ptr<ebase>> flags;
     queue<int> need;
 };
-
 
 template<>
 struct cmdline::entry<bool> : public cmdline::ebase
