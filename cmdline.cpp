@@ -10,16 +10,17 @@ public:
     bool tflag = 1;
     bool zflag = 0;
     bool bflag = false;
+    int trials = 10;
     string filename;
 
     cmdopts()
     {
-        setopt('v', verbose,  "verbose output.");
-        setopt('f', filename, "file name", "filename"
-            );
-        setopt('z', zflag,    "compress");
-        setopt('t', tflag,    "print table");
-        setopt('b', bflag,    "boolean flag");
+        setopt('v', verbose,  "Extra informational messages.");
+        setopt('f', filename, "<file> Name of the output file.", "filename");
+        setopt('n', trials,   "<num>  Number of trials to run.", "trials");
+        setopt('z', zflag,    "Compress.");
+        setopt('t', tflag,    "Print table.");
+        setopt('b', bflag,    "Random boolean flag.");
     }
 };
 

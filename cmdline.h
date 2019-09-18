@@ -4,9 +4,14 @@
 
      - bare "unknown option" is lame
 
-     - usage() needs to communicate whether an option takes
-       an argument or not.  How can I do this?  And what would
-       be a useful thing to say?
+     - Clients also want a way to customize the usage message,
+       at least a little.  Like, a summary line that says what
+       the program actually does.
+
+     - Should --help be included automatically?
+
+     - It seems limiting to force a short form for all flags.
+
 */
 
 #pragma once
@@ -19,6 +24,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <cstdlib>
+#include <iomanip>
 
 using namespace std;
 
@@ -73,12 +79,17 @@ public:
         cerr << "Usage: " << Args[0] << " [options] [args]" << "\n";
         cerr << "\n";
         cerr << "Options:\n";
+        cerr << std::left;
+
         for (auto& flag : flags)
         {
             cerr << "  -" << flag->flag;
+
+            string col2;
             if (flag->longform.length())
-                cerr << ", --" << flag->longform;
-            cerr << "    " << flag->help << "\n";
+                col2 = ", --"s + flag->longform;
+            cerr << setw(15) << col2;
+            cerr << " " << flag->help << "\n";
         }
 
         std::exit(1);
