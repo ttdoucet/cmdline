@@ -1,8 +1,12 @@
 /*
    Todo:
-     - Stop on errors instead of continuing.
-     - usage() construction
      - figure out what is happening with the -- sequence
+
+     - bare "unknown option" is lame
+
+     - usage() needs to communicate whether an option takes
+       an argument or not.  How can I do this?  And what would
+       be a useful thing to say?
 */
 
 #pragma once
@@ -66,13 +70,15 @@ public:
         if (s.length())
             cerr << s << "\n";
 
-        cerr << "Usage:\n";
+        cerr << "Usage: " << Args[0] << " [options] [args]" << "\n";
+        cerr << "\n";
+        cerr << "Options:\n";
         for (auto& flag : flags)
         {
-            cerr << " -" << flag->flag;
+            cerr << "  -" << flag->flag;
             if (flag->longform.length())
                 cerr << ", --" << flag->longform;
-            cerr << "  " << flag->help << "\n";
+            cerr << "    " << flag->help << "\n";
         }
 
         std::exit(1);
