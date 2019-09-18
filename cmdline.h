@@ -92,15 +92,13 @@ private:
     void short_flag(char ch)
     {
         int i = find_flag(ch);
-        if (i < flags.size() )
-        {
-            if (flags[i]->needs_arg)
-                need.push(i);
-            else
-                flags[i]->set_value(""s);
-        }
-        else
+        if (i == flags.size() )
             throw runtime_error("unknown flag: "s + ch);
+
+        if (flags[i]->needs_arg)
+            need.push(i);
+        else
+            flags[i]->set_value(""s);
     }
 
     struct ebase
