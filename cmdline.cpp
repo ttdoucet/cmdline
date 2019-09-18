@@ -11,6 +11,7 @@ public:
     bool zflag = 0;
     bool bflag = false;
     int trials = 10;
+    float alpha = 0.05;
     string filename;
 
     cmdopts()
@@ -21,6 +22,7 @@ public:
         setopt('z', zflag,    "Compress.");
         setopt('t', tflag,    "Print table.");
         setopt('b', bflag,    "Random boolean flag.");
+        setopt('a', alpha,    "<float> Learning rate.",  "--alpha");
     }
 };
 
@@ -35,6 +37,8 @@ int main(int argc, char *argv[])
     cout << "file name: " << opts.filename << "\n";
     cout << "bflag: " << opts.bflag << "\n";
     cout << "trials: " << opts.trials << "\n";
+    cout << "alpha: " << opts.alpha << "\n";
+
     cout << "\n";
     cout << "ExtraArgs:\n";
     for (string& s : opts.ExtraArgs)

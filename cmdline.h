@@ -1,7 +1,5 @@
 /*
    Todo:
-     - Check for error in set_value().
-
      - Clients need a way to customize the usage message,
        at least a little.  Like, a summary line that says what
        the program actually does.
@@ -20,6 +18,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <iomanip>
+#include <iostream>
 
 namespace detail_cmdline
 {
@@ -101,7 +100,7 @@ private:
 
     int find_opt(char ch)
     {
-        for (int i = 0; i < flags.size(); ++i)
+        for (size_t i = 0; i < flags.size(); ++i)
             if (flags[i]->flag == ch)
                 return i;
         throw runtime_error("Unknown switch: -"s + ch);
@@ -109,7 +108,7 @@ private:
 
     int find_opt(const string& longform)
     {
-        for (int i = 0; i < flags.size(); ++i)
+        for (size_t i = 0; i < flags.size(); ++i)
             if (flags[i]->longform == longform)
                 return i;
         throw runtime_error("Unknown switch: "s + longform);
@@ -151,7 +150,9 @@ private:
         void set_value(const string& s)
         {
             stringstream ss{s};
-            ss >> val;  // nyi: check for error
+            ss >> val;
+            if (ss.fail() || !ss.eof())
+                throw runtime_error("unexpected value: '"s + s + "'"s);
         }
     };
 
