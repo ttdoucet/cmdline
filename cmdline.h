@@ -152,6 +152,7 @@ namespace detail_cmdline
             // We do not need to know the type of the destination here.
             // We only need to be able to set it from a string.
             virtual void set_value(const string& s) = 0;
+            virtual ~ebase() = default;
         };
 
         template<typename T>
