@@ -27,7 +27,7 @@ ExtraArgs:
   baz
 $
 $ demo --help
-Usage: ./demo [options] [args]
+Usage: demo [options] [args]
 Meaningless set of switches to test code.
 
 Options:
