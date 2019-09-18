@@ -1,7 +1,5 @@
-/* Written by Todd Doucet.
- */
+/* Written by Todd Doucet. */
 #pragma once
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -17,10 +15,8 @@ namespace detail_cmdline
 {
     using namespace std;
 
-    class cmdline
+    struct cmdline
     {
-    public:
-
         vector<string> Args;
         vector<string> ExtraArgs;
 
@@ -86,7 +82,8 @@ namespace detail_cmdline
             if (s.length())
                 cerr << s << "\n";
 
-            cerr << "Usage: " << Args[0] << " [options] [args]" << "\n\n";
+            cerr << "Usage: " << Args[0] << " [options] [args]" << "\n";
+            cerr << summary << "\n";
             cerr << "Options:\n" << std::left;
 
             for (auto& flag : flags)
@@ -107,8 +104,12 @@ namespace detail_cmdline
             std::exit(1);
         }
 
-    private:
+        void set_summary(const string& text)
+        {
+            summary = text;
+        }
 
+    private:
         int find_opt(char ch)
         {
             for (size_t i = 0; i < flags.size(); ++i)
@@ -169,6 +170,7 @@ namespace detail_cmdline
 
         vector<unique_ptr<ebase>> flags;
         queue<int> need;
+        string summary;
     };
 
     template<>
@@ -181,8 +183,6 @@ namespace detail_cmdline
 
         void set_value(const string&) { val = !val; }
     };
-
 } // namespace
 
 using detail_cmdline::cmdline;
-

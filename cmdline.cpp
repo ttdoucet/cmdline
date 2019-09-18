@@ -29,6 +29,8 @@ public:
         setopt('a', "--alpha",    alpha,    "<float> Learning rate.");
 
         setopt("--gamma", gamma, "<float> Credit decay rate.");
+
+        set_summary("Meaningless set of switches to test code.\n");
     }
 };
 
