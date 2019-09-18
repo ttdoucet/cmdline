@@ -34,5 +34,6 @@ int main(int argc, char *argv[])
     cout << "compress: " << opts.zflag << "\n";
     cout << "file name: " << opts.filename << "\n";
     cout << "bflag: " << opts.bflag << "\n";
+    cout << "trials: " << opts.trials << "\n";
 }
 

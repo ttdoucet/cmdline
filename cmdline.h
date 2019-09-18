@@ -1,14 +1,12 @@
 /*
    Todo:
+     - Check for error in set_value().
+
      - Clients need a way to customize the usage message,
        at least a little.  Like, a summary line that says what
        the program actually does.
 
-     - Should --help be included automatically?
-
      - It seems limiting to force a short form for all flags.
-
-     - Check for error in set_value().
 */
 
 #pragma once
@@ -22,6 +20,9 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <iomanip>
+
+namespace detail_cmdline
+{
 
 using namespace std;
 
@@ -168,4 +169,8 @@ struct cmdline::entry<bool> : public cmdline::ebase
 
     void set_value(const string&) { val = !val; }
 };
+
+} // namespace
+
+using detail_cmdline::cmdline;
 
