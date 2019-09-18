@@ -8,7 +8,7 @@
 
      - It seems limiting to force a short form for all flags.
 
-     - Many instances of string should be string& or const string&.
+     - Check for error in set_value().
 */
 
 #pragma once
@@ -39,7 +39,7 @@ public:
 
         try
         {
-            for (string& s : Args)
+            for (const string& s : Args)
             {
                 if (s[0] == '-')
                 {
@@ -68,7 +68,7 @@ public:
         }
     }
 
-    void usage(string s=""s)
+    void usage(const string& s=""s)
     {
         if (s.length())
             cerr << s << "\n";
@@ -106,7 +106,7 @@ private:
         throw runtime_error("Unknown switch: -"s + ch);
     }
 
-    int find_opt(string longform)
+    int find_opt(const string& longform)
     {
         for (int i = 0; i < flags.size(); ++i)
             if (flags[i]->longform == longform)
@@ -134,7 +134,7 @@ private:
 
         // We do not need to know the type of the destination here.
         // We only need to be able to set it from a string.
-        virtual void set_value(string s) = 0;
+        virtual void set_value(const string& s) = 0;
     };
 
     template<typename T>
@@ -145,7 +145,7 @@ private:
         entry(char flag, T& v, string help, string lform)
             : ebase{flag, help, lform}, val{v}  { }
 
-        void set_value(string s)
+        void set_value(const string& s)
         {
             stringstream ss{s};
             ss >> val;  // nyi: check for error
@@ -164,6 +164,6 @@ struct cmdline::entry<bool> : public cmdline::ebase
     entry(char flag, bool& v, string help, string lform)
         : ebase{flag, help, lform, false}, val{v} { }
 
-    void set_value(string unused) { val = !val; }
+    void set_value(const string&) { val = !val; }
 };
 
