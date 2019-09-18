@@ -101,6 +101,7 @@ namespace detail_cmdline
                 cerr << setw(15) << col2;
                 cerr << " " << flag->help << "\n";
             }
+            cerr << "    " << setw(15) << "  --help" << " Print this message and exit.\n";
             std::exit(1);
         }
 
@@ -123,6 +124,8 @@ namespace detail_cmdline
             for (size_t i = 0; i < flags.size(); ++i)
                 if (flags[i]->longform == longform)
                     return i;
+            if (longform == "--help")
+                usage();
             throw runtime_error("Unknown switch: "s + longform);
         }
 
