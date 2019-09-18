@@ -44,10 +44,10 @@ public:
                 if (s[0] == '-')
                 {
                     if  (s[1] == '-')
-                        do_flag(find_opt(s));
+                        do_flag(s);
                     else
                         for (char ch : s.substr(1))
-                            do_flag(find_opt(ch));
+                            do_flag(ch);
                 }
                 else if (need.empty())
                     ExtraArgs.push_back(s);
@@ -66,6 +66,13 @@ public:
         {
             usage(e.what());
         }
+    }
+
+    template<typename T>
+    void setopt(char flag, T& val, string help, string longform=""s)
+    {
+        auto e = make_unique<entry<T>>(flag, val, help, longform);
+        flags.push_back(move(e));
     }
 
     void usage(const string& s=""s)
@@ -89,13 +96,6 @@ public:
         std::exit(1);
     }
 
-    template<typename T>
-    void setopt(char flag, T& val, string help, string longform=""s)
-    {
-        auto e = make_unique<entry<T>>(flag, val, help, longform);
-        flags.push_back(move(e));
-    }
-
 private:
 
     int find_opt(char ch)
@@ -114,8 +114,10 @@ private:
         throw runtime_error("Unknown switch: "s + longform);
     }
 
-    void do_flag(int i)
+    template<typename T>
+    void do_flag(T flag)
     {
+        int i = find_opt(flag);
         if (flags[i]->needs_arg)
             need.push(i);
         else
