@@ -35,5 +35,11 @@ int main(int argc, char *argv[])
     cout << "file name: " << opts.filename << "\n";
     cout << "bflag: " << opts.bflag << "\n";
     cout << "trials: " << opts.trials << "\n";
+    cout << "\n";
+    cout << "ExtraArgs:\n";
+    for (string& s : opts.ExtraArgs)
+        cout << s << "\n";
+
+
 }
 
