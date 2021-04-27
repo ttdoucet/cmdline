@@ -1,7 +1,7 @@
 #CXX = g++-10
 CXX = clang++
 
-CXXFLAGS = -Ofast -ffast-math --std=c++17 -MMD
+CXXFLAGS = -Ofast -ffast-math --std=c++17 -MMD -I..
 
 src = cmdline.cpp
 obj = $(src:.cpp=.o)
